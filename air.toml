@@ -1,0 +1,18 @@
+# The root directory of the project
+root = "."
+
+# Temporary directory where Air stores its temp files
+tmp_dir = "tmp"
+
+[build]
+  # The name of the binary file to be generated
+  bin = "main"
+
+  # Build command: {{.Output}} and {{.Input}} are placeholders
+  cmd = "go build -o {{.Output}} {{.Input}}"
+
+  # Files or directories to watch
+  include = ["**/*.go"]
+
+  # Files or directories to ignore for triggering rebuilds
+  exclude = ["tmp/**", "client/**"]
