@@ -1,6 +1,8 @@
 # Binaries for programs and plugins (except in temp/)
 !temp/*.exe
 !temp/*.log
+!tmp/*.exe
+!tmp/*.log
 *.exe~
 *.dll
 *.so
