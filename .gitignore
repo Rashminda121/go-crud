@@ -3,6 +3,8 @@
 !temp/*.log
 !tmp/*.exe
 !tmp/*.log
+
+tmp/
 *.exe~
 *.dll
 *.so
