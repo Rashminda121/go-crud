@@ -57,7 +57,7 @@ func main() {
 	app.Get("/api/todos",getTodos)
 	app.Post("/api/todos", createTodo)
 	app.Patch("/api/todos/:id", updateTodo)
-	// app.Delete("/api/todos/:id", deleteTodo)
+	app.Delete("/api/todos/:id", deleteTodo)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -140,4 +140,20 @@ func updateTodo(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{"message": "Todo updated successfully"})
 }
 
-// func deleteTodo(c *fiber.Ctx) error {}
+func deleteTodo(c *fiber.Ctx) error {
+	id := c.Params("id")
+	objectId,err := primitive.ObjectIDFromHex(id)
+
+	if err !=nil{
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid ID format"})
+	}
+
+	filter := bson.M{"_id": objectId}
+
+	_,err = collection.DeleteOne(context.Background(),filter)
+
+	if err != nil {		
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete todo"})
+	}
+	return c.Status(200).JSON(fiber.Map{"message": "Todo deleted successfully"})
+}
