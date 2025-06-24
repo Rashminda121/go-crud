@@ -18,6 +18,18 @@ tmp/
 vendor/
 Godeps/
 
+# Node.js dependencies and logs inside client folder only
+client/node_modules/
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+client/pnpm-debug.log*
+
+# Lock files inside client folder only
+client/package-lock.json
+client/yarn.lock
+client/pnpm-lock.yaml
+
 # IDE/editor settings
 .vscode/
 .idea/
@@ -38,10 +50,12 @@ go.work.sum
 
 # Ignore .env files
 .env
-.env.* 
+.env.*
 
 # Ignore exe and log files globally except inside temp/
 *.exe
 *.log
 !temp/*.exe
 !temp/*.log
+
+*.tsbuildinfo
