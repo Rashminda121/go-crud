@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./App.css";
-import { FiSun, FiMoon, FiTrash2, FiPlus } from "react-icons/fi";
+import { FiSun, FiMoon, FiTrash2, FiPlus, FiCheck } from "react-icons/fi";
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -8,6 +8,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [todoToDelete, setTodoToDelete] = useState(null);
 
   const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
 
@@ -92,9 +93,19 @@ function App() {
     }
   };
 
-  const deleteTodo = async (id) => {
+  const confirmDelete = (id) => {
+    setTodoToDelete(id);
+  };
+
+  const cancelDelete = () => {
+    setTodoToDelete(null);
+  };
+
+  const deleteTodo = async () => {
+    if (!todoToDelete) return;
+
     try {
-      const response = await fetch(`${API_BASE}/api/todos/${id}`, {
+      const response = await fetch(`${API_BASE}/api/todos/${todoToDelete}`, {
         method: "DELETE",
       });
 
@@ -102,9 +113,11 @@ function App() {
         throw new Error(`Failed to delete todo: ${response.status}`);
       }
 
-      setTodos(todos.filter((todo) => todo._id !== id));
+      setTodos(todos.filter((todo) => todo._id !== todoToDelete));
+      setTodoToDelete(null);
     } catch (err) {
       setError(err.message);
+      setTodoToDelete(null);
     }
   };
 
@@ -142,8 +155,14 @@ function App() {
         </div>
 
         <div className="todo-list">
-          {todos.length === 0 ? (
-            <p className="empty-state">No todos yet. Add one above!</p>
+          {(!todos || todos.length === 0) && !loading ? (
+            <div className="empty-state-container">
+              <div className="empty-state-icon">📭</div>
+              <h3 className="empty-state-title">No Todos Available</h3>
+              <p className="empty-state-message">
+                You don't have any todos yet. Add one above to get started!
+              </p>
+            </div>
           ) : (
             todos.map((todo) => (
               <div
@@ -159,16 +178,44 @@ function App() {
                   />
                   <span className="todo-text">{todo.body}</span>
                 </div>
-                <button
-                  onClick={() => deleteTodo(todo._id)}
-                  className="delete-button"
-                >
-                  <FiTrash2 size={16} />
-                </button>
+                {todoToDelete === todo._id ? (
+                  <div className="delete-confirmation">
+                    <button onClick={deleteTodo} className="confirm-button">
+                      <FiCheck size={16} />
+                    </button>
+                    <button onClick={cancelDelete} className="cancel-button">
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => confirmDelete(todo._id)}
+                    className="delete-button"
+                  >
+                    <FiTrash2 size={16} />
+                  </button>
+                )}
               </div>
             ))
           )}
         </div>
+
+        {/* Delete confirmation modal */}
+        {todoToDelete && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <p>Are you sure you want to delete this todo?</p>
+              <div className="modal-actions">
+                <button onClick={deleteTodo} className="modal-confirm">
+                  Delete
+                </button>
+                <button onClick={cancelDelete} className="modal-cancel">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
